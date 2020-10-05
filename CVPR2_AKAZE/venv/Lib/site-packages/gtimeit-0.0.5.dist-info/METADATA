@@ -1,0 +1,34 @@
+Metadata-Version: 2.1
+Name: gtimeit
+Version: 0.0.5
+Summary: Timer, benchmark and ressource usage tracker. A tool for python functions. Time and compare your functions inside or outside a program.
+Home-page: https://github.com/Chthi/gtimeit
+Author: Thibault Charmet
+Author-email: 
+License: UNKNOWN
+Keywords: time benchmark track plot compare
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: numpy (>=1.18.2)
+Requires-Dist: matplotlib (>=3.2.1)
+
+
+# gtimeit
+Timer, benchmark and ressource usage tracker.
+A tool for python functions. Time and compare your functions inside or outside a program.
+
+## Benchmark
+
+Allows to run multiple python functions a certain amount of times and to compare there respective execution times.
+Similar to [timeit](https://docs.python.org/2/library/timeit.html) Display curves of all the execution times.
+Prototype : benchmarking for complexity tests up to one variable parameter. The variable take all the values of a given range and the benchmarck keeps track of the executions times.
+
+## Tracker
+Allow to keep track of the execution time of some functions in a program. Useful to know which part of your program take the more time to execute.
+
+Read the README at https://github.com/Chthi/gtimeit for more information.
+
+
