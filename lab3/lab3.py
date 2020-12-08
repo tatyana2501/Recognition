@@ -147,31 +147,37 @@ class EBMA_searcher():
         return predicted_frame, motion_field
 
 def plot_psnr(psnr):
-    plt.plot(np.arange(1,21),psnr, c='magenta')
+    plt.plot(np.arange(1,44),psnr, c='magenta')
     plt.show()
 
-# def build(anchor_frame, target_frame, N,M, motion_field,acc):
-#     # predicted frame. anchor_frame is predicted from target_frame
-#     predicted_frame = np.empty((anchor_frame.shape[0],anchor_frame.shape[1] ), dtype=np.uint8)
-#     for (blk_row, blk_col) in itertools.product(xrange(0, height - (N - 1), N),
-#                                                 xrange(0, width - (M - 1), M)):
-#         up_l_candidate_blk = ((blk_row + r_row) * acc, (blk_col + r_col) * acc)
-#         low_r_candidate_blk = ((blk_row + r_row + N - 1) * acc, (blk_col + r_col + M - 1) * acc)
-#
-#         # construct the predicted image with the block that matches this block
-#         predicted_frame[blk_row:blk_row + N, blk_col:blk_col + M] = matching_blk
+def build(frame, N,M, motion_field,acc = 1):
+    # predicted frame. anchor_frame is predicted from target_frame
+      predicted_frame = np.empty((frame.shape[0],frame.shape[1] ), dtype=np.uint8)
+      for (blk_row, blk_col) in itertools.product(xrange(0, height - (N - 1), N),
+                                                xrange(0, width - (M - 1), M)):
+          r_col = int(motion_field[blk_row // N, blk_col // M, 1])
+          r_row = int(motion_field[blk_row // N, blk_col // M, 0])
+          up_l_candidate_blk = ((blk_row + r_row) * acc, (blk_col + r_col) * acc)
+          low_r_candidate_blk = ((blk_row + r_row + N - 1) * acc, (blk_col + r_col + M - 1) * acc)
 
+          matching_blk = frame[list(up_l_candidate_blk)[0]:list(low_r_candidate_blk)[0] + 1
+                          , list(up_l_candidate_blk)[1]:list(low_r_candidate_blk)[1] + 1][::acc, ::acc]
+
+
+         # construct the predicted image with the block that matches this block
+          predicted_frame[blk_row:blk_row + N, blk_col:blk_col + M] = matching_blk
+      return predicted_frame
 
 psnr_a=[]
 v1=v2a("vid1.mp4")
 height, width = v1[0].shape[:2]
-ebma = EBMA_searcher(N=200,
-                     M=200,
-                     R=201,
+ebma = EBMA_searcher(N=54,
+                     M=54,
+                     R=100,
                      p=1,
-                     acc=2)
+                     acc=1)
 newVideo=[]
-for i in range(0,20):
+for i in range(0,43):
     target_frm = np.array(cv2.resize(v1[2*i], (width,height), interpolation=cv2.INTER_CUBIC))
     anchor_frm = np.array(cv2.resize(v1[2*i+1], (width,height), interpolation=cv2.INTER_CUBIC))
     #target_frm = np.reshape(target_frm[:width*height], (width, height))
@@ -181,10 +187,12 @@ for i in range(0,20):
     plt.imsave('ebma_frames/frames_of_interest{0}-{1}/anchor.png'.format(2*i ,2*i+1), anchor_frm)
 
 
-
-    predicted_frm, motion_field = \
+    N = 54
+    M = 54
+    motion_field = \
     ebma.run(anchor_frame=anchor_frm,
-             target_frame=target_frm)
+             target_frame=target_frm)[1]
+    predicted_frm = build(target_frm, N, M, motion_field)
     newVideo.append(anchor_frm)
     newVideo.append(predicted_frm)
     # store predicted frame
