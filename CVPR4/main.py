@@ -11,7 +11,7 @@ from itertools import repeat
 parser = argparse.ArgumentParser(add_help=True)
 parser.add_argument("-i", "--input", help="input file")
 parser.add_argument('-m', "--mode", action='store', dest='modevalue',
-                    help='choose mode - void, random, reverse, invert, bloom, pulse, jiggle, overlap', default='void')
+                    help='choose mode - void,  ', default='void')
 parser.add_argument('-c', action='store', dest='countframes', default=1,
                     help="how often to glitch (for modes that support it)")
 parser.add_argument('-n', action='store', dest='positframes', default=1,
@@ -33,6 +33,7 @@ firstframe = args.firstframe
 kill = args.kill
 timevid=int(args.timevid)
 
+
 if filein is None or os.path.exists(filein) == False:
     capture_duration = timevid
     cap = cv2.VideoCapture(0)
@@ -53,6 +54,9 @@ if filein is None or os.path.exists(filein) == False:
     out.release()
     filein='output.avi'
 
+cap = cv2.VideoCapture(filein)
+length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+g_start=time.time()
 # define temp directory and files
 temp_nb = random.randint(10000, 99999)
 temp_dir = "temp-" + str(temp_nb)
@@ -248,6 +252,7 @@ with open(temp_movi, 'rb') as rd:
                 wr.write(rd.read(x[1]))
 
 bstream_until_marker(temp_idx1, fileout)
+g_end=time.time()
 
 # remove unnecessary temporary files and folders
 os.remove(temp_hdrl)
@@ -256,7 +261,9 @@ os.remove(temp_idx1)
 os.rmdir(temp_dir)
 
 print("> step 5/5 : done - final idx size : " + str(len(final)))
-
+print("total frames: {}".format(length))
+print("time:  {}".format(g_end-g_start))
+print("{1} speed: {0} frames per second".format(length/(g_end-g_start),mode))
 capture=cv2.VideoCapture(fileout)
 while(capture.isOpened()):
     ret,frame = capture.read()
